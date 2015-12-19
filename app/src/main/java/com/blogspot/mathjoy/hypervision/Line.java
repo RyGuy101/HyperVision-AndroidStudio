@@ -1,4 +1,4 @@
-package com.example.hypervision;
+package com.blogspot.mathjoy.hypervision;
 
 public class Line {
 	public int getStartIndex() {

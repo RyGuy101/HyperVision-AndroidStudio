@@ -1,4 +1,4 @@
-package com.example.hypervision;
+package com.blogspot.mathjoy.hypervision;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
