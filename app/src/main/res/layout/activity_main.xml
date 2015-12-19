@@ -1,0 +1,228 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.blogspot.mathjoy.hypervision.MainActivity" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#000000"
+            android:orientation="horizontal" >
+
+            <LinearLayout
+                android:id="@+id/rdLayout1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:paddingLeft	="4dp"
+                android:paddingRight="4dp"
+                android:visibility="gone" >
+
+                <Button
+                    android:id="@+id/button3D1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="rotate3D4D"
+                    android:text="3D"
+                    android:textColor="#CCCCCC" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/rdLayout2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp"
+                android:visibility="gone" >
+
+                <Button
+                    android:id="@+id/button3D2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="rotate3D4D"
+                    android:text="3D"
+                    android:textColor="#CCCCCC" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <com.blogspot.mathjoy.hypervision.HyperView
+            android:id="@+id/hyperView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/settings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <RadioGroup
+            android:id="@+id/rotateDimRG"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="Rotation: "
+                android:textColor="#000000" />
+
+            <RadioButton
+                android:id="@+id/rotate3D"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/light_gray"
+                android:button="@android:color/transparent"
+                android:checked="true"
+                android:gravity="center"
+                android:text="  3D  " />
+
+            <RadioButton
+                android:id="@+id/rotate4D"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/transparent"
+                android:button="@android:color/transparent"
+                android:gravity="center"
+                android:text="  4D  " />
+        </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#E0E0E0"
+            android:orientation="horizontal"
+            android:padding="8dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="Stereoscopic 3D: "
+                android:textColor="#000000" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+
+                    <RadioGroup
+                        android:id="@+id/stereoRG"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" >
+
+                        <RadioButton
+                            android:id="@+id/off3D"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/light_gray"
+                            android:button="@android:color/transparent"
+                            android:checked="true"
+                            android:gravity="center"
+                            android:text="  Off  " />
+
+                        <RadioButton
+                            android:id="@+id/redCyan"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/transparent"
+                            android:button="@android:color/transparent"
+                            android:gravity="center"
+                            android:text="  Red/Cyan  " />
+
+                        <RadioButton
+                            android:id="@+id/crossEye"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/transparent"
+                            android:button="@android:color/transparent"
+                            android:gravity="center"
+                            android:text="  Cross Eye  " />
+
+                        <RadioButton
+                            android:id="@+id/parallel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/transparent"
+                            android:button="@android:color/transparent"
+                            android:gravity="center"
+                            android:text="  Parallel  " />
+                    </RadioGroup>
+                </HorizontalScrollView>
+
+                <SeekBar
+                    android:id="@+id/angle3D"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="150"
+                    android:progress="70" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="3D projection: "
+                android:textColor="#000000" />
+
+            <SeekBar
+                android:id="@+id/proj3D"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="1000"
+                android:progress="125" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#E0E0E0"
+            android:orientation="horizontal"
+            android:padding="8dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="#E0E0E0"
+                android:text="4D projection: "
+                android:textColor="#000000" />
+
+            <SeekBar
+                android:id="@+id/proj4D"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#E0E0E0"
+                android:max="1000"
+                android:progress="500" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
