@@ -3,19 +3,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    tools:context="com.blogspot.mathjoy.hypervision.MainActivity" >
+    tools:context="com.blogspot.mathjoy.hypervision.MainActivity">
 
     <LinearLayout
         android:id="@+id/settings"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="0"
         android:layout_height="match_parent"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="8dp" >
+            android:padding="8dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -28,7 +29,7 @@
                 android:id="@+id/rotateDimRG"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+                android:orientation="horizontal">
 
                 <RadioButton
                     android:id="@+id/rotate3D"
@@ -56,7 +57,7 @@
             android:layout_height="wrap_content"
             android:background="#E0E0E0"
             android:orientation="vertical"
-            android:padding="8dp" >
+            android:padding="8dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -68,17 +69,17 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
+                android:orientation="vertical">
 
                 <HorizontalScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
+                    android:layout_height="wrap_content">
 
                     <RadioGroup
                         android:id="@+id/stereoRG"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal" >
+                        android:orientation="horizontal">
 
                         <RadioButton
                             android:id="@+id/off3D"
@@ -132,7 +133,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="8dp" >
+            android:padding="8dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -154,7 +155,7 @@
             android:layout_height="wrap_content"
             android:background="#E0E0E0"
             android:orientation="vertical"
-            android:padding="8dp" >
+            android:padding="8dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -177,19 +178,40 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="right"
-            android:orientation="horizontal" >
+            android:orientation="horizontal">
 
             <Button
+                android:id="@+id/hideSettingsButt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:text="&lt;" />
+                android:onClick="hideSettings"
+                android:text="&lt;"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+            <!-- < less than sign -->
         </LinearLayout>
     </LinearLayout>
 
-    <com.blogspot.mathjoy.hypervision.HyperView
-        android:id="@+id/hyperView"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent" />
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <com.blogspot.mathjoy.hypervision.HyperView
+            android:id="@+id/hyperView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <Button
+            android:id="@+id/showSettingsButt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:onClick="showSettings"
+            android:text="&gt;"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:visibility="gone" />
+        <!-- > more than sign -->
+    </FrameLayout>
 
 </LinearLayout>

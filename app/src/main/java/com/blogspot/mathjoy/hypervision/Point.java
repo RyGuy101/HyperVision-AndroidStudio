@@ -1,4 +1,4 @@
-package com.example.hypervision;
+package com.blogspot.mathjoy.hypervision;
 
 public class Point {
 	public static final int MAX_DIMENSIONS = 10;
