@@ -125,15 +125,13 @@ public class MainActivity extends AppCompatActivity {
                 HyperView.rotate3DAdjust = -hp.rotate3D / 2.0;
             }
         });
-        if (!getResources().getBoolean(R.bool.isTablet)) {
+        if (true) {
             final View rdLayout1 = findViewById(R.id.rdLayout1);
             ViewTreeObserver vto = rdLayout1.getViewTreeObserver();
             vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    int width = rdLayout1.getMeasuredWidth();
-                    rdLayout1.setLeft((int) (hp.panX - width / 2.0));
-                    rdLayout1.setRight(rdLayout1.getLeft() + width);
+                    refreshLeftRDButton();
                 }
             });
             final View rdLayout2 = findViewById(R.id.rdLayout2);
@@ -141,12 +139,11 @@ public class MainActivity extends AppCompatActivity {
             vto2.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
                 public void onGlobalLayout() {
-                    int width = rdLayout2.getMeasuredWidth();
-                    rdLayout2.setLeft((int) (hp.shift + hp.panX - width / 2.0));
-                    rdLayout2.setRight(rdLayout2.getLeft() + width);
+                    refreshRightRDButton();
                 }
             });
-        } else {
+        }
+        if (getResources().getBoolean(R.bool.isTablet)) {
             final LinearLayout settings = (LinearLayout) findViewById(R.id.settings);
             ViewTreeObserver vto = settings.getViewTreeObserver();
             vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -161,7 +158,9 @@ public class MainActivity extends AppCompatActivity {
                     if (settings.getVisibility() == View.GONE) {
                         findViewById(R.id.showSettingsButt).setVisibility(View.VISIBLE);
                     } else if (hp.shrink) {
-                        ((View) (hp.getParent())).setLeft(hp.initialParentLeft);
+                        findViewById(R.id.outerHyperViewLayout).setLeft(hp.initialOuterLayoutLeft);
+                        findViewById(R.id.innerHyperViewLayout).setRight(hp.initialInnerLayoutRight);
+                        findViewById(R.id.buttonLayout).setRight(hp.initialButtonLayoutRight);
                         hp.setRight(hp.initialRight);
                     }
                     hp.setup = true;
@@ -169,6 +168,20 @@ public class MainActivity extends AppCompatActivity {
             });
         }
         activity = this;
+    }
+
+    public void refreshRightRDButton() {
+        View rdLayout2 = findViewById(R.id.rdLayout2);
+        int width = rdLayout2.getMeasuredWidth();
+        rdLayout2.setLeft((int) (hp.shift + hp.panX - width / 2.0));
+        rdLayout2.setRight(rdLayout2.getLeft() + width);
+    }
+
+    public void refreshLeftRDButton() {
+        View rdLayout1 = findViewById(R.id.rdLayout1);
+        int width = rdLayout1.getMeasuredWidth();
+        rdLayout1.setLeft((int) (hp.panX - width / 2.0));
+        rdLayout1.setRight(rdLayout1.getLeft() + width);
     }
 
     public void rotate3D4D(View v) {
@@ -239,22 +252,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                
+
             }
         }
         if (checkedId == R.id.rotate3D) {
             hp.rotateDim = 3;
-            if (!getResources().getBoolean(R.bool.isTablet)) {
-                ((TextView) findViewById(R.id.button3D1)).setText("3D");
-                ((TextView) findViewById(R.id.button3D2)).setText("3D");
-            }
+            ((TextView) findViewById(R.id.button3D1)).setText("3D");
+            ((TextView) findViewById(R.id.button3D2)).setText("3D");
             rotateDimRG.check(checkedId);
         } else if (checkedId == R.id.rotate4D) {
             hp.rotateDim = 2;
-            if (!getResources().getBoolean(R.bool.isTablet)) {
-                ((TextView) findViewById(R.id.button3D1)).setText("4D");
-                ((TextView) findViewById(R.id.button3D2)).setText("4D");
-            }
+            ((TextView) findViewById(R.id.button3D1)).setText("4D");
+            ((TextView) findViewById(R.id.button3D2)).setText("4D");
             rotateDimRG.check(checkedId);
         }
     }
@@ -285,7 +294,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void showSettings(View v) {
-        hp.initialParentLeft = ((View) (hp.getParent())).getLeft();
+        hp.initialOuterLayoutLeft = findViewById(R.id.outerHyperViewLayout).getLeft();
+        hp.initialInnerLayoutRight = findViewById(R.id.innerHyperViewLayout).getRight();
+        hp.initialButtonLayoutRight = findViewById(R.id.buttonLayout).getRight();
         hp.initialRight = hp.getRight();
         hp.shrink = true;
         LinearLayout settings = (LinearLayout) findViewById(R.id.settings);

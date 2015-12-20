@@ -12,6 +12,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.widget.Button;
 
 public class HyperView extends View implements OnTouchListener {
     double shift = 0;
@@ -95,18 +96,22 @@ public class HyperView extends View implements OnTouchListener {
     @Override
     protected void onDraw(Canvas c) {
         long startTime = System.currentTimeMillis();
-        if (setup) {
-            setup();
-            setup = false;
-        }
         if (expand) {
             respondToTouch = false;
             expand();
             refreshSize();
+            MainActivity.activity.refreshLeftRDButton();
+            MainActivity.activity.refreshRightRDButton();
         } else if (shrink) {
             respondToTouch = false;
             shrink();
             refreshSize();
+            MainActivity.activity.refreshLeftRDButton();
+            MainActivity.activity.refreshRightRDButton();
+        }
+        if (setup) {
+            setup();
+            setup = false;
         }
         if (bitmap == null) {
             bitmap = Bitmap.createBitmap(c.getWidth(), c.getHeight(), Bitmap.Config.ARGB_8888);
@@ -242,6 +247,8 @@ public class HyperView extends View implements OnTouchListener {
 
         rotate(new int[]{1, 3}, -rotate3D / 2.0 - rotate3DAdjust);
         rotate3DAdjust = -rotate3D / 2.0;
+        MainActivity.activity.refreshLeftRDButton();
+        MainActivity.activity.refreshRightRDButton();
     }
 
 
@@ -313,7 +320,7 @@ public class HyperView extends View implements OnTouchListener {
             int index = 0;
             for (int i = 0; i < axes.length + 2; i++) {
                 boolean match = false;
-                for (int axis: axes) {
+                for (int axis : axes) {
                     if (axis == i) {
                         match = true;
                     }
@@ -339,7 +346,7 @@ public class HyperView extends View implements OnTouchListener {
             int index = 0;
             for (int i = 0; i < axes.length + 2; i++) {
                 boolean match = false;
-                for (int axis: axes) {
+                for (int axis : axes) {
                     if (axis == i) {
                         match = true;
                     }
@@ -385,28 +392,33 @@ public class HyperView extends View implements OnTouchListener {
 
     boolean startExpand = true;
     long startExpandTime;
-    int duration = 250;
+    int duration = 1000;
     int distance;
-    int initialParentLeft = -1;
-    int initialParentRight;
+    int initialOuterLayoutLeft;
+    int initialOuterLayoutRight;
+    int initialInnerLayoutRight;
+    int initialButtonLayoutRight;
     int initialRight;
 
     private void expand() {
         if (startExpand) {
             distance = MainActivity.activity.settingsWidth;
-            initialParentLeft = ((View) getParent()).getLeft();
-            initialParentRight = ((View) getParent()).getRight();
+            initialOuterLayoutLeft = MainActivity.activity.findViewById(R.id.outerHyperViewLayout).getLeft();
+            initialOuterLayoutRight = MainActivity.activity.findViewById(R.id.outerHyperViewLayout).getRight();
+            initialInnerLayoutRight = MainActivity.activity.findViewById(R.id.innerHyperViewLayout).getRight();
+            initialButtonLayoutRight = MainActivity.activity.findViewById(R.id.buttonLayout).getRight();
             initialRight = getRight();
             startExpand = false;
             startExpandTime = System.currentTimeMillis();
         } else if (System.currentTimeMillis() - startExpandTime < duration) {
             int currentDistance = (int) ((((double) (System.currentTimeMillis() - startExpandTime)) / duration) * distance);
-            ((View) getParent()).setLeft(initialParentLeft - currentDistance);
-            ((View) getParent()).setRight(initialParentRight + currentDistance);
+            MainActivity.activity.findViewById(R.id.outerHyperViewLayout).setLeft(initialOuterLayoutLeft - currentDistance);
+            MainActivity.activity.findViewById(R.id.outerHyperViewLayout).setRight(initialOuterLayoutRight + currentDistance);
+            MainActivity.activity.findViewById(R.id.innerHyperViewLayout).setRight(initialInnerLayoutRight + currentDistance);
+            MainActivity.activity.findViewById(R.id.buttonLayout).setRight(initialButtonLayoutRight + currentDistance);
             setRight(initialRight + currentDistance);
         } else {
             stopExpand();
-            initialParentLeft = -1;
         }
     }
 
@@ -426,10 +438,10 @@ public class HyperView extends View implements OnTouchListener {
             startShrinkTime = System.currentTimeMillis();
         } else if (System.currentTimeMillis() - startShrinkTime < duration) {
             int currentDistance = (int) ((((double) (System.currentTimeMillis() - startShrinkTime)) / duration) * distance);
-            ((View) getParent()).setLeft(initialParentLeft + currentDistance);
+            MainActivity.activity.findViewById(R.id.outerHyperViewLayout).setLeft(initialOuterLayoutLeft + currentDistance);
             setRight(initialRight - currentDistance);
         } else {
-            ((View) getParent()).setLeft(initialParentLeft + distance);
+            MainActivity.activity.findViewById(R.id.outerHyperViewLayout).setLeft(initialOuterLayoutLeft + distance);
             setRight(initialRight - distance);
             stopShrink();
         }

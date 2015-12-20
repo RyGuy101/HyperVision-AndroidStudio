@@ -32,8 +32,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:onClick="rotate3D4D"
-                    android:text="3D"
-                    android:textColor="#CCCCCC" />
+                    android:text="3D" />
             </LinearLayout>
 
             <LinearLayout
@@ -52,7 +51,7 @@
                     android:layout_height="wrap_content"
                     android:onClick="rotate3D4D"
                     android:text="3D"
-                    android:textColor="#CCCCCC" />
+                    />
             </LinearLayout>
         </LinearLayout>
 

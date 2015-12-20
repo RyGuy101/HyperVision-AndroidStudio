@@ -180,10 +180,8 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/background_light"
-            android:orientation="vertical">
             android:layout_gravity="right"
-            android:orientation="horizontal">
+            android:background="@android:color/background_light">
 
             <Button
                 android:id="@+id/hideSettingsButt"
@@ -198,26 +196,76 @@
     </LinearLayout>
 
     <FrameLayout
-        android:id="@+id/hyperViewLayout"
+        android:id="@+id/outerHyperViewLayout"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_toRightOf="@id/settings">
+
+        <LinearLayout
+            android:id="@+id/innerHyperViewLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/buttonLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#000000"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/rdLayout1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="4dp">
+
+                    <Button
+                        android:id="@+id/button3D1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:onClick="rotate3D4D"
+                        android:text="3D" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/rdLayout2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="4dp">
+
+                    <Button
+                        android:id="@+id/button3D2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:onClick="rotate3D4D"
+                        android:text="3D" />
+                </LinearLayout>
+            </LinearLayout>
 
             <com.blogspot.mathjoy.hypervision.HyperView
                 android:id="@+id/hyperView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
+        </LinearLayout>
 
-            <Button
-                android:id="@+id/showSettingsButt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:onClick="showSettings"
-                android:text="&gt;"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:visibility="gone" />
-            <!-- > more than sign -->
+
+        <Button
+            android:id="@+id/showSettingsButt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:onClick="showSettings"
+            android:text="&gt;"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:visibility="gone" />
+        <!-- > more than sign -->
 
     </FrameLayout>
 
