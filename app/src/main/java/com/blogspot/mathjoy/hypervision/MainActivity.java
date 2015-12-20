@@ -1,16 +1,18 @@
 package com.blogspot.mathjoy.hypervision;
 
-import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -22,8 +24,7 @@ import com.blogspot.mathjoy.hypervision.R;
 public class MainActivity extends AppCompatActivity {
     HyperView hp;
     public static MainActivity activity;
-    private int settingsWidth = -1;
-    private int hpRight = -1;
+    int settingsWidth = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,14 +161,11 @@ public class MainActivity extends AppCompatActivity {
                         settingsWidth = width + hp.getMeasuredWidth() - hp.getMeasuredHeight();
                     }
                     params.width = settingsWidth;
-//                    if (hpRight == -1) {
-//                        hpRight = width + hp.getMeasuredHeight();
-//                    }
-//                    hp.setRight(hp.getMeasuredHeight());
-                    if (settings.getVisibility() == View.GONE){
-//                        hp.setRight(settingsWidth + hp.getMeasuredHeight());
-                    }else{
-//                        hp.setRight(hp.getMeasuredHeight());
+                    if (settings.getVisibility() == View.GONE) {
+                        findViewById(R.id.showSettingsButt).setVisibility(View.VISIBLE);
+                    } else if (hp.shrink) {
+                        ((View) (hp.getParent())).setLeft(hp.initialParentLeft);
+                        hp.setRight(hp.initialRight);
                     }
                     hp.setup = true;
                 }
@@ -284,14 +282,38 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void hideSettings(View v) {
-        findViewById(R.id.settings).setVisibility(View.GONE);
-        findViewById(R.id.showSettingsButt).setVisibility(View.VISIBLE);
+        findViewById(R.id.hideSettingsButt).setClickable(false);
+        LinearLayout settings = (LinearLayout) findViewById(R.id.settings);
+        Animation anim = AnimationUtils.loadAnimation(this, R.anim.out_left);
+        anim.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                hp.stopExpand();
+                findViewById(R.id.settings).setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        settings.startAnimation(anim);
+        hp.expand = true;
     }
 
     public void showSettings(View v) {
+        hp.initialParentLeft = ((View) (hp.getParent())).getLeft();
+        hp.initialRight = hp.getRight();
+        hp.shrink = true;
         LinearLayout settings = (LinearLayout) findViewById(R.id.settings);
-        LayoutParams params = settings.getLayoutParams();
+        Animation anim = AnimationUtils.loadAnimation(this, R.anim.in_left);
+        settings.startAnimation(anim);
         findViewById(R.id.settings).setVisibility(View.VISIBLE);
         findViewById(R.id.showSettingsButt).setVisibility(View.GONE);
+        findViewById(R.id.hideSettingsButt).setClickable(true);
     }
 }
