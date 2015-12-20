@@ -6,6 +6,12 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.app.Activity;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     HyperView hp;
     public static MainActivity activity;
     int settingsWidth = -1;
+    private int hpRight = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -304,6 +311,7 @@ public class MainActivity extends AppCompatActivity {
         settings.startAnimation(anim);
         hp.expand = true;
     }
+
 
     public void showSettings(View v) {
         hp.initialParentLeft = ((View) (hp.getParent())).getLeft();
