@@ -3,14 +3,6 @@ package com.blogspot.mathjoy.hypervision;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.app.Activity;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
-import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,13 +17,10 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.blogspot.mathjoy.hypervision.R;
-
 public class MainActivity extends AppCompatActivity {
     HyperView hp;
     public static MainActivity activity;
     int settingsWidth = -1;
-    private int hpRight = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,20 +43,21 @@ public class MainActivity extends AppCompatActivity {
         stereo.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                ((RadioButton) findViewById(checkedId)).setBackgroundResource(R.drawable.light_gray);
+                findViewById(checkedId).setBackgroundResource(R.drawable.light_gray);
                 for (int i = 0; i < stereo.getChildCount(); i++) {
                     try {
                         if (stereo.getChildAt(i).getId() != checkedId) {
                             stereo.getChildAt(i).setBackgroundResource(R.drawable.transparent);
                         }
                     } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
-                ((SeekBar) findViewById(R.id.angle3D)).setClickable(true); //TODO Make this work like it should.
+                (findViewById(R.id.angle3D)).setClickable(true);
                 if (checkedId == R.id.off3D) {
                     hp.stereo3D = HyperView.OFF_3D;
                     hp.setup = true;
-                    ((SeekBar) findViewById(R.id.angle3D)).setClickable(false); //TODO Make this work like it should.
+                    (findViewById(R.id.angle3D)).setClickable(false); //TODO Make this work like it should. Right now seek bar is still movable
                 } else if (checkedId == R.id.redCyan) {
                     hp.stereo3D = HyperView.RED_CYAN_3D;
                     hp.setup = true;
@@ -181,27 +171,6 @@ public class MainActivity extends AppCompatActivity {
         activity = this;
     }
 
-    public void setupLayout() {
-        if (!getResources().getBoolean(R.bool.isTablet)) {
-            //			View rdLayout1 = findViewById(R.id.rdLayout1);
-            //			int width1 = rdLayout1.getMeasuredWidth();
-            //			rdLayout1.setLeft((int) (hp.panX - width1 / 2.0));
-            //			rdLayout1.setRight(rdLayout1.getLeft() + width1);
-            //			View rdLayout2 = findViewById(R.id.rdLayout2);
-            //			int width2 = rdLayout2.getMeasuredWidth();
-            //			rdLayout2.setLeft((int) (hp.shift + hp.panX - width2 / 2.0));
-            //			rdLayout2.setRight(rdLayout2.getLeft() + width2);
-        }
-    }
-
-    //	public void rotate3D(View v) {
-    //		hp.rotateDim = 3;
-    //	}
-    //
-    //	public void rotate4D(View v) {
-    //		hp.rotateDim = 2;
-    //	}
-
     public void rotate3D4D(View v) {
         if (hp.rotateDim == 3) {
             rotateDimChanged((RadioGroup) findViewById(R.id.rotateDimRG), R.id.rotate4D);
@@ -261,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void rotateDimChanged(final RadioGroup rotateDimRG, int checkedId) {
-        ((RadioButton) findViewById(checkedId)).setBackgroundResource(R.drawable.light_gray);
+        findViewById(checkedId).setBackgroundResource(R.drawable.light_gray);
         for (int i = 0; i < rotateDimRG.getChildCount(); i++) {
             try {
                 RadioButton temp = (RadioButton) rotateDimRG.getChildAt(i);
@@ -269,6 +238,8 @@ public class MainActivity extends AppCompatActivity {
                     rotateDimRG.getChildAt(i).setBackgroundResource(R.drawable.transparent);
                 }
             } catch (Exception e) {
+                e.printStackTrace();
+                
             }
         }
         if (checkedId == R.id.rotate3D) {

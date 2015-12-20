@@ -22,10 +22,10 @@ public class HyperView extends View implements OnTouchListener {
     Paint linePaint = new Paint();
     Paint pointPaint2 = new Paint();
     Paint linePaint2 = new Paint();
-    static ArrayList<Point> originalPoints = new ArrayList<Point>();
-    static ArrayList<Point> points = new ArrayList<Point>();
-    ArrayList<Point> points2 = new ArrayList<Point>();
-    static ArrayList<Line> lines = new ArrayList<Line>();
+    static ArrayList<Point> originalPoints = new ArrayList<>();
+    static ArrayList<Point> points = new ArrayList<>();
+    ArrayList<Point> points2 = new ArrayList<>();
+    static ArrayList<Line> lines = new ArrayList<>();
     int dimension = 4;
     int numPoints = (int) Math.pow(2, dimension);
     double size;
@@ -126,30 +126,6 @@ public class HyperView extends View implements OnTouchListener {
             prevX = currentX;
             prevY = currentY;
             down = 1;
-            //			double numAxes = 2;
-            //			double angle = totalAngle * (Math.pow(numAxes, 1 / 2.0) / (double) numAxes);
-
-            //		if (currentAngle == 360)
-            //		{
-            //			currentAngle = 0;
-            //			points.clear();
-            //			for (Point p : originalPoints)
-            //			{
-            //				points.add(p.clone());
-            //			}
-            //			totalAngle = 0;
-            //		} else
-            //		{
-            //			currentAngle += totalAngle;
-            //		}
-
-            //				rotate(new int[] { 0, 1 }, currentAngle);
-            //		rotate(new int[] { 0, 2 }, totalAngle);
-            //				rotate(new int[] { 0, 3 }, currentAngle);
-            //				rotate(new int[] { 1, 2 }, currentAngle);
-            //		rotate(new int[] { 1, 3 }, currentAngle);
-            //		rotate(new int[] { 2, 3 }, currentAngle);
-
             for (Line l : lines) {
                 drawLine(myCanvas, l);
             }
@@ -162,22 +138,12 @@ public class HyperView extends View implements OnTouchListener {
             for (Point p : points2) {
                 drawPoint2.doo(myCanvas, p);
             }
-            //			if (stereo3D == RED_CYAN_3D && bitmap != null) {
-            //				for (int x = 0; x < this.getWidth(); x++) {
-            //					for (int y = 0; y < this.getHeight(); y++) {
-            //						if (Color.red(bitmap.getPixel(x, y)) > 0 && Color.blue(bitmap.getPixel(x, y)) > 0) {
-            //							bitmap.setPixel(x, y, Color.rgb(127, 127, 127));
-            //						} else if (Color.blue(bitmap.getPixel(x, y)) > 127) {
-            //							bitmap.setPixel(x, y, Color.rgb(0, 127, 127));
-            //						}
-            //					}
-            //				}
-            //			}
             long timeTook = System.currentTimeMillis() - startTime;
             if (timeTook < 1000.0 / frameRate) {
                 try {
                     Thread.sleep((long) (1000.0 / frameRate - timeTook));
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             if (bitmap != null) {
@@ -276,8 +242,6 @@ public class HyperView extends View implements OnTouchListener {
 
         rotate(new int[]{1, 3}, -rotate3D / 2.0 - rotate3DAdjust);
         rotate3DAdjust = -rotate3D / 2.0;
-
-        MainActivity.activity.setupLayout();
     }
 
 
@@ -311,11 +275,8 @@ public class HyperView extends View implements OnTouchListener {
         double m1 = Math.pow(depth3D, points.get(l.getStartIndex()).getCoord(2)) * Math.pow(depth4D, points.get(l.getStartIndex()).getCoord(3) - 1);
         double m2 = Math.pow(depth3D, points.get(l.getEndIndex()).getCoord(2)) * Math.pow(depth4D, points.get(l.getEndIndex()).getCoord(3) - 1);
 
-        //		c.drawLine((float) (panX + m1 * size * sizeAdjust * points.get(l.getStartIndex()).getCoord(0)), (float) (panY + m1 * size * sizeAdjust * points.get(l.getStartIndex()).getCoord(1)), (float) (panX + m2 * size * sizeAdjust * points.get(l.getEndIndex()).getCoord(0)), (float) (panY + m2 * size * sizeAdjust * points.get(l.getEndIndex()).getCoord(1)), linePaint);
         float width1 = (float) ((Math.pow(depth3D, Math.pow(depth4D, points.get(l.getStartIndex()).getCoord(3) - 1) * points.get(l.getStartIndex()).getCoord(2))) * pointThickness / 2.0);
-        //		float width1 = (float) ((Math.pow(depth3D, Math.pow(depth4D, points.get(l.getStartIndex()).getCoord(3)) * points.get(l.getStartIndex()).getCoord(2))) * (pointThickness / 2.0));
         float width2 = (float) ((Math.pow(depth3D, Math.pow(depth4D, points.get(l.getEndIndex()).getCoord(3) - 1) * points.get(l.getEndIndex()).getCoord(2))) * pointThickness / 2.0);
-        //		float width2 = (float) ((Math.pow(depth3D, Math.pow(depth4D, points.get(l.getEndIndex()).getCoord(3)) * points.get(l.getEndIndex()).getCoord(2))) * (pointThickness / 2.0));
         float x1 = (float) (panX + m1 * size * sizeAdjust * points.get(l.getStartIndex()).getCoord(0));
         float y1 = (float) (panY + m1 * size * sizeAdjust * points.get(l.getStartIndex()).getCoord(1));
         float x2 = (float) (panX + m2 * size * sizeAdjust * points.get(l.getEndIndex()).getCoord(0));
@@ -327,20 +288,12 @@ public class HyperView extends View implements OnTouchListener {
         path.reset();
         float sinTheta = (float) Math.sin(theta);
         float cosTheta = (float) Math.cos(theta);
-        path.moveTo((float) (x1 + width1 * sinTheta), (float) (y1 - width1 * cosTheta));
-        path.lineTo((float) (x1 - width1 * sinTheta), (float) (y1 + width1 * cosTheta));
-        path.lineTo((float) (x2 - width2 * sinTheta), (float) (y2 + width2 * cosTheta));
-        path.lineTo((float) (x2 + width2 * sinTheta), (float) (y2 - width2 * cosTheta));
+        path.moveTo(x1 + width1 * sinTheta, y1 - width1 * cosTheta);
+        path.lineTo(x1 - width1 * sinTheta, y1 + width1 * cosTheta);
+        path.lineTo(x2 - width2 * sinTheta, y2 + width2 * cosTheta);
+        path.lineTo(x2 + width2 * sinTheta, y2 - width2 * cosTheta);
         c.drawPath(path, linePaint);
     }
-
-    //	private void drawLine2(Canvas c, Line l)
-    //	{
-    //		double m1 = Math.pow(DEPTH_3D, points2.get(l.getStartIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points2.get(l.getStartIndex()).getCoord(3) - 1);
-    //		double m2 = Math.pow(DEPTH_3D, points2.get(l.getEndIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points2.get(l.getEndIndex()).getCoord(3) - 1);
-    //
-    //		c.drawLine((float) ((panX + m1 * size*sizeAdjust * points2.get(l.getStartIndex()).getCoord(0)) + shift), (float) (panY + m1 * size*sizeAdjust * points2.get(l.getStartIndex()).getCoord(1)), (float) ((panX + m2 * size*sizeAdjust * points2.get(l.getEndIndex()).getCoord(0)) + shift), (float) (panY + m2 * size*sizeAdjust * points2.get(l.getEndIndex()).getCoord(1)), linePaint2);
-    //	}
 
     private void drawBackground(Canvas c) {
         c.drawColor(Color.BLACK);
@@ -348,19 +301,8 @@ public class HyperView extends View implements OnTouchListener {
 
     private void drawPoint(Canvas c, Point p) {
         double m = Math.pow(depth3D, p.getCoord(2)) * Math.pow(depth4D, p.getCoord(3) - 1);
-        //		pointPaint.setStrokeWidth((float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3)) * p.getCoord(2))) * 10));
-        //		c.drawPoint((float) (pan + m * size*sizeAdjust * p.getCoord(0)), (float) (pan + m * size*sizeAdjust * p.getCoord(1)), pointPaint);
         c.drawCircle((float) (panX + m * size * sizeAdjust * p.getCoord(0)), (float) (panY + m * size * sizeAdjust * p.getCoord(1)), (float) ((Math.pow(depth3D, Math.pow(depth4D, p.getCoord(3) - 1) * p.getCoord(2))) * pointThickness), pointPaint);
     }
-
-    //	private void drawPoint2(Canvas c, Point p)
-    //	{
-    //		double m = Math.pow(DEPTH_3D, p.getCoord(2)) * Math.pow(DEPTH_4D, p.getCoord(3) - 1);
-    //		//		pointPaint2.setStrokeWidth((float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3)) * p.getCoord(2))) * 10));
-    //		//		c.drawPoint((float) ((pan + m * size*sizeAdjust * p.getCoord(0)) + shift), (float) (pan + m * size*sizeAdjust * p.getCoord(1)), pointPaint2);
-    //		c.drawCircle((float) ((panX + m * size*sizeAdjust * p.getCoord(0)) + shift), (float) (panY + m * size*sizeAdjust * p.getCoord(1)), (float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3) - 1) * p.getCoord(2))) * 5), pointPaint2);
-    //	}
-
 
     public void rotate(int[] axes, double degrees) {
         double sin_t = Math.sin(Math.toRadians(degrees));
@@ -371,8 +313,8 @@ public class HyperView extends View implements OnTouchListener {
             int index = 0;
             for (int i = 0; i < axes.length + 2; i++) {
                 boolean match = false;
-                for (int j = 0; j < axes.length; j++) {
-                    if (axes[j] == i) {
+                for (int axis: axes) {
+                    if (axis == i) {
                         match = true;
                     }
                 }
@@ -397,8 +339,8 @@ public class HyperView extends View implements OnTouchListener {
             int index = 0;
             for (int i = 0; i < axes.length + 2; i++) {
                 boolean match = false;
-                for (int j = 0; j < axes.length; j++) {
-                    if (axes[j] == i) {
+                for (int axis: axes) {
+                    if (axis == i) {
                         match = true;
                     }
                 }
@@ -476,8 +418,6 @@ public class HyperView extends View implements OnTouchListener {
 
     boolean startShrink = true;
     long startShrinkTime;
-    int initialLeft;
-
 
     private void shrink() {
         if (startShrink) {
