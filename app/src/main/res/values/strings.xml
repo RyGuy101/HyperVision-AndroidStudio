@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">HyperVision</string>
+    <string name="title_activity_manual">ManualActivity</string>
 </resources>

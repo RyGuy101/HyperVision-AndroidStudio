@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -57,11 +58,13 @@ public class HyperView extends View implements OnTouchListener {
     boolean expand = false;
     boolean shrink = false;
     boolean respondToTouch = true;
+    GestureDetector gestureDetector;
 
     public HyperView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.setDrawingCacheEnabled(true);
         initialSetup();
+        gestureDetector = new GestureDetector(context, new GestureListener());
     }
 
     public void initialSetup() {
@@ -371,6 +374,7 @@ public class HyperView extends View implements OnTouchListener {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (respondToTouch) {
+            gestureDetector.onTouchEvent(event);
             if (event.getAction() != MotionEvent.ACTION_MOVE) {
                 down = 0;
             }
@@ -381,6 +385,13 @@ public class HyperView extends View implements OnTouchListener {
         return false;
     }
 
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            MainActivity.activity.switchRotateDimension();
+            return true;
+        }
+    }
 
     public interface DrawPoint2 {
         void doo(Canvas c, Point p);
@@ -392,12 +403,13 @@ public class HyperView extends View implements OnTouchListener {
 
     boolean startExpand = true;
     long startExpandTime;
-    int duration = 1000;
+    int duration = 250;
     int distance;
     int initialOuterLayoutLeft;
     int initialOuterLayoutRight;
     int initialInnerLayoutRight;
     int initialButtonLayoutRight;
+    int initialButtonWidth;
     int initialRight;
 
     private void expand() {
@@ -407,6 +419,7 @@ public class HyperView extends View implements OnTouchListener {
             initialOuterLayoutRight = MainActivity.activity.findViewById(R.id.outerHyperViewLayout).getRight();
             initialInnerLayoutRight = MainActivity.activity.findViewById(R.id.innerHyperViewLayout).getRight();
             initialButtonLayoutRight = MainActivity.activity.findViewById(R.id.buttonLayout).getRight();
+            initialButtonWidth = MainActivity.activity.findViewById(R.id.button3D1).getLayoutParams().width;
             initialRight = getRight();
             startExpand = false;
             startExpandTime = System.currentTimeMillis();
@@ -434,6 +447,7 @@ public class HyperView extends View implements OnTouchListener {
     private void shrink() {
         if (startShrink) {
             distance = MainActivity.activity.settingsWidth;
+            initialButtonWidth = MainActivity.activity.findViewById(R.id.button3D1).getLayoutParams().width;
             startShrink = false;
             startShrinkTime = System.currentTimeMillis();
         } else if (System.currentTimeMillis() - startShrinkTime < duration) {

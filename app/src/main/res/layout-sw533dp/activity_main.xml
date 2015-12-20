@@ -219,14 +219,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:paddingLeft="4dp"
                     android:paddingRight="4dp">
 
                     <Button
                         android:id="@+id/button3D1"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
                         android:onClick="rotate3D4D"
                         android:text="3D" />
                 </LinearLayout>
@@ -236,13 +237,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:paddingLeft="4dp"
                     android:paddingRight="4dp">
 
                     <Button
                         android:id="@+id/button3D2"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
+                        android:layout_gravity="center_horizontal"
                         android:layout_height="wrap_content"
                         android:onClick="rotate3D4D"
                         android:text="3D" />

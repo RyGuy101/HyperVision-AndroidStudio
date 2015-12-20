@@ -1,5 +1,6 @@
 package com.blogspot.mathjoy.hypervision;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -185,6 +186,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void rotate3D4D(View v) {
+        switchRotateDimension();
+    }
+
+    public void switchRotateDimension() {
         if (hp.rotateDim == 3) {
             rotateDimChanged((RadioGroup) findViewById(R.id.rotateDimRG), R.id.rotate4D);
         } else if (hp.rotateDim == 2) {
@@ -229,16 +234,21 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        HyperView.points.clear();
-        HyperView.originalPoints.clear();
-        HyperView.lines.clear();
-        ((SeekBar) findViewById(R.id.proj3D)).setProgress(125);
-        ((SeekBar) findViewById(R.id.proj4D)).setProgress(500);
-        ((SeekBar) findViewById(R.id.angle3D)).setProgress(70);
-        rotateDimChanged((RadioGroup) findViewById(R.id.rotateDimRG), R.id.rotate3D);
-        HyperView.rotate3DAdjust = 0;
-        hp.initialSetup();
-        hp.setup = true;
+        if (item.getItemId() == R.id.reset) {
+            HyperView.points.clear();
+            HyperView.originalPoints.clear();
+            HyperView.lines.clear();
+            ((SeekBar) findViewById(R.id.proj3D)).setProgress(125);
+            ((SeekBar) findViewById(R.id.proj4D)).setProgress(500);
+            ((SeekBar) findViewById(R.id.angle3D)).setProgress(70);
+            rotateDimChanged((RadioGroup) findViewById(R.id.rotateDimRG), R.id.rotate3D);
+            HyperView.rotate3DAdjust = 0;
+            hp.initialSetup();
+            hp.setup = true;
+        } else if (item.getItemId() == R.id.manual) {
+            Intent intent = new Intent(this, ManualActivity.class);
+            startActivity(intent);
+        }
         return true;
     }
 

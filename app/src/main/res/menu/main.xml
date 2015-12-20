@@ -8,4 +8,9 @@
         app:showAsAction="ifRoom"
         android:title="Reset"/>
 
+    <item
+        android:id="@+id/manual"
+        app:showAsAction="ifRoom"
+        android:title="Manual"/>
+
 </menu>
