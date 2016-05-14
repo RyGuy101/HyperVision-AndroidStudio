@@ -1,8 +1,8 @@
 package com.blogspot.mathjoy.hypervision;
 
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
@@ -122,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     hp.rotate3D = 0;
                 }
-                hp.rotate(new int[]{1, 3}, -hp.rotate3D / 2.0 - HyperView.rotate3DAdjust);
+                hp.rotate(new int[]{1, 3}, -hp.rotate3D / 2.0 - HyperView.rotate3DAdjust, HyperView.points);
                 HyperView.rotate3DAdjust = -hp.rotate3D / 2.0;
             }
         });
@@ -216,6 +217,14 @@ public class MainActivity extends AppCompatActivity {
                     ((TextView) findViewById(R.id.button3D2)).setText("4D");
                 }
                 getSupportActionBar().hide();
+                if (Build.VERSION.SDK_INT < 16) {
+                    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                            WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                } else {
+                    View decorView = getWindow().getDecorView();
+                    int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+                    decorView.setSystemUiVisibility(uiOptions);
+                }
                 hp.setup = true;
             } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
                 findViewById(R.id.settings).setVisibility(View.VISIBLE);
@@ -245,10 +254,11 @@ public class MainActivity extends AppCompatActivity {
             HyperView.rotate3DAdjust = 0;
             hp.initialSetup();
             hp.setup = true;
-        } else if (item.getItemId() == R.id.manual) {
-            Intent intent = new Intent(this, ManualActivity.class);
-            startActivity(intent);
         }
+//        else if (item.getItemId() == R.id.manual) {
+//            Intent intent = new Intent(this, ManualActivity.class);
+//            startActivity(intent);
+//        }
         return true;
     }
 

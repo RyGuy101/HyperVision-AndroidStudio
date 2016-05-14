@@ -142,7 +142,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="3D projection: "
+                android:text="3D perspective: "
                 android:textColor="#000000" />
 
             <SeekBar
@@ -165,7 +165,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:background="#E0E0E0"
-                android:text="4D projection: "
+                android:text="4D perspective: "
                 android:textColor="#000000" />
 
             <SeekBar

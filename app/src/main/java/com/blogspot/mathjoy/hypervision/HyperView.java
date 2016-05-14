@@ -1,6 +1,7 @@
 package com.blogspot.mathjoy.hypervision;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -39,6 +40,9 @@ public class HyperView extends View implements OnTouchListener {
     double prevY;
     double currentX;
     double currentY;
+    double velocityX;
+    double velocityY;
+    boolean touching = false;
     int down = 0;
     public int rotateDim = 3;
     public static final int OFF_3D = 0;
@@ -55,6 +59,7 @@ public class HyperView extends View implements OnTouchListener {
     Path path = new Path();
     private Bitmap bitmap;
     Canvas myCanvas;
+    private double dpi;
     boolean expand = false;
     boolean shrink = false;
     boolean respondToTouch = true;
@@ -68,14 +73,19 @@ public class HyperView extends View implements OnTouchListener {
     }
 
     public void initialSetup() {
+        dpi = getResources().getDisplayMetrics().xdpi;
         if (points.size() == 0) {
-            for (int i = 0; i < numPoints; i++) {
+            for (int pointIndex = 0; pointIndex < numPoints; pointIndex++) {
+                String binaryNum = String.format("%" + Integer.toString(dimension) + "s", Integer.toBinaryString(pointIndex)).replace(' ', '0');
                 double[] coords = new double[dimension];
-                for (int j = 1; j <= dimension; j++) {
-                    if (i % Math.pow(2, j) < Math.pow(2, j - 1)) {
-                        coords[dimension - j] = -1;
+                for (int coordDimension = 0; coordDimension < dimension; coordDimension++) {
+                    char binaryDigit = binaryNum.charAt(coordDimension);
+                    if (binaryDigit == '0') {
+                        coords[coordDimension] = -1;
+                    } else if (binaryDigit == '1') {
+                        coords[coordDimension] = 1;
                     } else {
-                        coords[dimension - j] = 1;
+                        throw new RuntimeException("Error when converting int to binary string.");
                     }
                 }
                 originalPoints.add(new Point(coords));
@@ -83,13 +93,12 @@ public class HyperView extends View implements OnTouchListener {
             for (Point p : originalPoints) {
                 points.add(p.clone());
             }
-            for (Point p : originalPoints) {
-                points2.add(p.clone());
-            }
-            for (int i = 1; i <= dimension; i++) {
-                for (int j = 0; j < numPoints; j += Math.pow(2, i)) {
-                    for (int k = 0; k < Math.pow(2, i - 1); k++) {
-                        lines.add(new Line(j + k, (int) (j + k + Math.pow(2, i - 1))));
+
+            for (int lineDimension = 0; lineDimension < dimension; lineDimension++) {
+                int groupSize = (int) Math.pow(2, lineDimension);
+                for (int pointIndex = 0; pointIndex < numPoints; pointIndex += groupSize * 2) {
+                    for (int groupIndex = 0; groupIndex < groupSize; groupIndex++) {
+                        lines.add(new Line(pointIndex + groupIndex, pointIndex + groupIndex + groupSize));
                     }
                 }
             }
@@ -122,15 +131,17 @@ public class HyperView extends View implements OnTouchListener {
         }
         if (myCanvas != null) {
             drawBackground(myCanvas);
-            double rotateX = down * (-currentX - -prevX) * (myCanvas.getWidth() / 1440.0);
-            double rotateY = down * (-currentY - -prevY) * (myCanvas.getWidth() / 1440.0);
-            rotate(new int[]{1, rotateDim}, rotateX);
-            rotate(new int[]{0, rotateDim}, rotateY);
+            if (touching) {
+                velocityX = down * ((-currentX - -prevX) / size) * 60;
+                velocityY = down * ((-currentY - -prevY) / size) * 60;
+            }
+            rotate(new int[]{1, rotateDim}, velocityX, points);
+            rotate(new int[]{0, rotateDim}, velocityY, points);
             points2.clear();
             for (Point p : points) {
                 points2.add(p.clone());
             }
-            rotate2(new int[]{1, 3}, rotate3D);
+            rotate(new int[]{1, 3}, rotate3D, points2);
             prevX = currentX;
             prevY = currentY;
             down = 1;
@@ -248,7 +259,7 @@ public class HyperView extends View implements OnTouchListener {
             linePaint2.setColor(Color.GRAY);
         }
 
-        rotate(new int[]{1, 3}, -rotate3D / 2.0 - rotate3DAdjust);
+        rotate(new int[]{1, 3}, -rotate3D / 2.0 - rotate3DAdjust, points);
         rotate3DAdjust = -rotate3D / 2.0;
         MainActivity.activity.refreshLeftRDButton();
         MainActivity.activity.refreshRightRDButton();
@@ -314,37 +325,14 @@ public class HyperView extends View implements OnTouchListener {
         c.drawCircle((float) (panX + m * size * sizeAdjust * p.getCoord(0)), (float) (panY + m * size * sizeAdjust * p.getCoord(1)), (float) ((Math.pow(depth3D, Math.pow(depth4D, p.getCoord(3) - 1) * p.getCoord(2))) * pointThickness), pointPaint);
     }
 
-    public void rotate(int[] axes, double degrees) {
+    public void rotate(int[] axes, double degrees, List<Point> points) {
+        if (axes.length != dimension - 2) {
+            throw new IllegalArgumentException("You can't rotate a " + dimension + " dimensional object around " + axes.length + " dimensions!");
+        }
         double sin_t = Math.sin(Math.toRadians(degrees));
         double cos_t = Math.cos(Math.toRadians(degrees));
         for (int n = 0; n < points.size(); n++) {
             Point point = points.get(n);
-            int[] affectedAxes = new int[2];
-            int index = 0;
-            for (int i = 0; i < axes.length + 2; i++) {
-                boolean match = false;
-                for (int axis : axes) {
-                    if (axis == i) {
-                        match = true;
-                    }
-                }
-                if (!match) {
-                    affectedAxes[index] = i;
-                    index++;
-                }
-            }
-            double first = point.getCoord(affectedAxes[0]);
-            double second = point.getCoord(affectedAxes[1]);
-            point.setCoord(affectedAxes[0], first * cos_t - second * sin_t);
-            point.setCoord(affectedAxes[1], second * cos_t + first * sin_t);
-        }
-    }
-
-    private void rotate2(int[] axes, double degrees) {
-        double sin_t = Math.sin(Math.toRadians(degrees));
-        double cos_t = Math.cos(Math.toRadians(degrees));
-        for (int n = 0; n < points2.size(); n++) {
-            Point point = points2.get(n);
             int[] affectedAxes = new int[2];
             int index = 0;
             for (int i = 0; i < axes.length + 2; i++) {
@@ -377,6 +365,11 @@ public class HyperView extends View implements OnTouchListener {
             gestureDetector.onTouchEvent(event);
             if (event.getAction() != MotionEvent.ACTION_MOVE) {
                 down = 0;
+            }
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+                touching = false;
+            } else {
+                touching = true;
             }
             currentX = event.getX();
             currentY = event.getY();
