@@ -20,17 +20,106 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static boolean doinDaDemo = false; //The Demo only works for the tablet version
+
     HyperView hp;
     public static MainActivity activity;
     int settingsWidth = -1;
+    int demoStep = -1;
+
+    public void startDemo(View v) {
+        findViewById(R.id.demoButt).setVisibility(View.GONE);
+        findViewById(R.id.demoText).setVisibility(View.VISIBLE);
+        findViewById(R.id.nextButt).setVisibility(View.VISIBLE);
+    }
+
+    public void nextDemo(View v) {
+        if (demoStep == -1) {
+            ((TextView) findViewById(R.id.demoText)).setText("Put on the 3D glasses");//Html.fromHtml("This is the <b>Hypercube</b>")
+            demoStep++;
+        } else if (demoStep == 0) {
+            ((TextView) findViewById(R.id.demoText)).setTextSize(24);
+            ((TextView) findViewById(R.id.demoText)).setText("Drag your finger to rotate the hypercube");
+            demoStep++;
+        } else if (demoStep == 1) {
+            ((TextView) findViewById(R.id.demoText)).setTextSize(25);
+            ((TextView) findViewById(R.id.demoText)).setText("Use the buttons on the left to rotate in 3D or 4D");
+            demoStep++;
+        } else if (demoStep == 2) {
+            ((TextView) findViewById(R.id.demoText)).setTextSize(30);
+            ((TextView) findViewById(R.id.demoText)).setText("3D rotation looks normal");
+            hp.autoRotate = true;
+            hp.autoRotateAngle = 360;
+            hp.autoRotateAngle = 360;
+            if (hp.rotateDim != 3) {
+                switchRotateDimension();
+            }
+            demoStep++;
+        } else if (demoStep == 3) {
+            ((TextView) findViewById(R.id.demoText)).setText("But 4D rotation looks crazy!");
+            hp.autoRotate = true;
+            hp.autoRotateAngle = 360;
+            if (hp.rotateDim != 2) {
+                switchRotateDimension();
+            }
+            demoStep++;
+        } else if (demoStep == 4) {
+            ((TextView) findViewById(R.id.demoText)).setText("Have fun at the BRAG Festival!");
+            hp.stopTouch = System.currentTimeMillis();
+            hp.demo = false;
+            hp.autoRotate = false;
+            demoStep++;
+        } else {
+            ((TextView) findViewById(R.id.demoText)).setText("HyperVision by Ryan Nemiroff");
+            findViewById(R.id.endDemoButt).setVisibility(View.VISIBLE);
+            findViewById(R.id.demoText).setVisibility(View.GONE);
+            findViewById(R.id.nextButt).setVisibility(View.GONE);
+            demoStep = -1;
+        }
+    }
+
+    public void endDemo(View v) {
+        ((TextView) findViewById(R.id.demoText)).setText("HyperVision by Ryan Nemiroff");
+        findViewById(R.id.demoText).setVisibility(View.GONE);
+        findViewById(R.id.nextButt).setVisibility(View.GONE);
+        demoStep = -1;
+        findViewById(R.id.endDemoButt).setVisibility(View.GONE);
+        findViewById(R.id.demoButt).setVisibility(View.VISIBLE);
+        hp.autoRotate = true;
+        hp.autoRotateAngle = 360;
+        if (hp.rotateDim != 3) {
+            switchRotateDimension();
+        }
+        if (findViewById(R.id.showSettingsButt).getVisibility() == View.VISIBLE) {
+            showSettings(null);
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        create();
+    }
+
+    private void create() {
         if (getResources().getBoolean(R.bool.isTablet)) {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            View decorView = getWindow().getDecorView();
+            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(uiOptions);
+            if (doinDaDemo) {
+                getSupportActionBar().hide();
+                setContentView(R.layout.activity_main_demo);
+            } else {
+                setContentView(R.layout.activity_main);
+                findViewById(R.id.angle3D).setEnabled(false);//This doesn't work in XML?!
+            }
+        } else {
+            setContentView(R.layout.activity_main);
+            findViewById(R.id.angle3D).setEnabled(false);//This doesn't work in XML?!
         }
-        setContentView(R.layout.activity_main);
         hp = (HyperView) findViewById(R.id.hyperView);
         final RadioGroup rotateDimRG = (RadioGroup) findViewById(R.id.rotateDimRG);
         rotateDimRG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -45,21 +134,22 @@ public class MainActivity extends AppCompatActivity {
         stereo.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                findViewById(checkedId).setBackgroundResource(R.drawable.light_gray);
+                findViewById(checkedId).setBackgroundResource(R.drawable.radio_selected);
                 for (int i = 0; i < stereo.getChildCount(); i++) {
                     try {
                         if (stereo.getChildAt(i).getId() != checkedId) {
-                            stereo.getChildAt(i).setBackgroundResource(R.drawable.transparent);
+                            stereo.getChildAt(i).setBackgroundResource(R.drawable.radio_not_selected);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
-                (findViewById(R.id.angle3D)).setClickable(true);
+                if (checkedId != R.id.off3D)
+                    (findViewById(R.id.angle3D)).setEnabled(true);
                 if (checkedId == R.id.off3D) {
+                    (findViewById(R.id.angle3D)).setEnabled(false);
                     hp.stereo3D = HyperView.OFF_3D;
                     hp.setup = true;
-                    (findViewById(R.id.angle3D)).setClickable(false); //TODO Make this work like it should. Right now seek bar is still movable
                 } else if (checkedId == R.id.redCyan) {
                     hp.stereo3D = HyperView.RED_CYAN_3D;
                     hp.setup = true;
@@ -154,7 +244,8 @@ public class MainActivity extends AppCompatActivity {
                     LayoutParams params = settings.getLayoutParams();
                     int width = settings.getMeasuredWidth();
                     if (settingsWidth == -1) {
-                        settingsWidth = width + hp.getMeasuredWidth() - hp.getMeasuredHeight();
+                        double settingsSize = doinDaDemo ? 0.75 : 0.666;
+                        settingsWidth = (int) (width + (hp.getMeasuredWidth() - hp.getMeasuredHeight()) * settingsSize);
                     }
                     params.width = settingsWidth;
                     if (settings.getVisibility() == View.GONE) {
@@ -218,8 +309,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 getSupportActionBar().hide();
                 if (Build.VERSION.SDK_INT < 16) {
-                    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                            WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 } else {
                     View decorView = getWindow().getDecorView();
                     int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
@@ -244,6 +334,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.reset) {
+            hp.autoRotate = false;
+            hp.stopTouch = System.currentTimeMillis();
             HyperView.points.clear();
             HyperView.originalPoints.clear();
             HyperView.lines.clear();
@@ -254,6 +346,9 @@ public class MainActivity extends AppCompatActivity {
             HyperView.rotate3DAdjust = 0;
             hp.initialSetup();
             hp.setup = true;
+        } else if (item.getItemId() == R.id.autoRotate) {
+            HyperView.autoRotate = true;
+            hp.autoRotateAngle = 360;
         }
 //        else if (item.getItemId() == R.id.manual) {
 //            Intent intent = new Intent(this, ManualActivity.class);
@@ -263,12 +358,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void rotateDimChanged(final RadioGroup rotateDimRG, int checkedId) {
-        findViewById(checkedId).setBackgroundResource(R.drawable.light_gray);
+        hp.velocityX = 0;
+        hp.velocityY = 0;
+//        hp.down = 0;
+        findViewById(checkedId).setBackgroundResource(R.drawable.radio_selected);
         for (int i = 0; i < rotateDimRG.getChildCount(); i++) {
             try {
                 RadioButton temp = (RadioButton) rotateDimRG.getChildAt(i);
                 if (rotateDimRG.getChildAt(i).getId() != checkedId) {
-                    rotateDimRG.getChildAt(i).setBackgroundResource(R.drawable.transparent);
+                    rotateDimRG.getChildAt(i).setBackgroundResource(R.drawable.radio_not_selected);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

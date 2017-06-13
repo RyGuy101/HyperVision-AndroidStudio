@@ -4,6 +4,11 @@
     tools:context="com.blogspot.mathjoy.hypervision.MainActivity" >
 
     <item
+        android:id="@+id/autoRotate"
+        app:showAsAction="ifRoom"
+        android:title="Auto Rotate"/>
+
+    <item
         android:id="@+id/reset"
         app:showAsAction="ifRoom"
         android:title="Reset"/>

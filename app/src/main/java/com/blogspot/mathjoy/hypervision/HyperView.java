@@ -9,7 +9,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,7 +21,7 @@ import android.widget.Button;
 public class HyperView extends View implements OnTouchListener {
     double shift = 0;
     double depth3D = 1.125;
-    double depth4D = 1.5;
+    double depth4D = 1.4;
     double frameRate = 60.0;
     Paint pointPaint = new Paint();
     Paint linePaint = new Paint();
@@ -42,6 +44,10 @@ public class HyperView extends View implements OnTouchListener {
     double currentY;
     double velocityX;
     double velocityY;
+    static boolean autoRotate = true;
+    boolean demo = false;
+    static long stopTouch;
+    double autoRotateAngle = 360;
     boolean touching = false;
     int down = 0;
     public int rotateDim = 3;
@@ -49,7 +55,7 @@ public class HyperView extends View implements OnTouchListener {
     public static final int RED_CYAN_3D = 1;
     public static final int CROSS_EYE_3D = 2;
     public static final int PARALLEL_3D = 3;
-    int stereo3D = OFF_3D;
+    int stereo3D = MainActivity.doinDaDemo ? RED_CYAN_3D : OFF_3D;
     double rotate3DMagnitude = 7;
     double rotate3D;
     static double rotate3DAdjust = 0;
@@ -103,6 +109,8 @@ public class HyperView extends View implements OnTouchListener {
                 }
             }
         }
+        velocityX = 0;
+        velocityY = 0;
     }
 
     @Override
@@ -130,32 +138,66 @@ public class HyperView extends View implements OnTouchListener {
             myCanvas = new Canvas(bitmap);
         }
         if (myCanvas != null) {
-            drawBackground(myCanvas);
-            if (touching) {
-                velocityX = down * ((-currentX - -prevX) / size) * 60;
-                velocityY = down * ((-currentY - -prevY) / size) * 60;
+            drawBackground();
+            if (startTime - stopTouch >= 20000 && !autoRotate && !touching) {
+                autoRotate = true;
+                autoRotateAngle = 360;
+                if (MainActivity.doinDaDemo)
+                    MainActivity.activity.endDemo(null);
             }
-            rotate(new int[]{1, rotateDim}, velocityX, points);
-            rotate(new int[]{0, rotateDim}, velocityY, points);
-            points2.clear();
-            for (Point p : points) {
-                points2.add(p.clone());
+            if (autoRotate) {
+                if (autoRotateAngle >= 360) {
+                    autoRotateAngle = 0;
+                    points.clear();
+                    for (Point p : originalPoints) {
+                        points.add(p.clone());
+                    }
+                    if (MainActivity.activity.demoStep == 3) {
+                        //rotate(new int[]{1, 3}, 15, points);
+                    } else if (MainActivity.activity.demoStep == 4) {
+                        rotate(new int[]{0, 3}, 15, points);
+                    }
+                }
+                if (autoRotateAngle != 0) {
+                    rotate(new int[]{1, 3}, -25, points);
+                }
+                autoRotateAngle += 0.6;
+                if (MainActivity.activity.demoStep != 3)
+                    rotate(new int[]{1, 2}, 0.6, points);
+                if (MainActivity.activity.demoStep != 4)
+                    rotate(new int[]{0, 3}, 0.6, points);
+//                if (MainActivity.activity.demoStep == 4) {
+                rotate(new int[]{1, 3}, 25, points);
+//                }
+            } else {
+                if (touching) {
+                    velocityX = down * ((-currentX - -prevX) / size) * 60;
+                    velocityY = down * ((-currentY - -prevY) / size) * 60;
+                }
+                rotate(new int[]{1, rotateDim}, velocityX, points);
+                rotate(new int[]{0, rotateDim}, velocityY, points);
+                prevX = currentX;
+                prevY = currentY;
+                down = 1;
             }
-            rotate(new int[]{1, 3}, rotate3D, points2);
-            prevX = currentX;
-            prevY = currentY;
-            down = 1;
             for (Line l : lines) {
-                drawLine(myCanvas, l);
+                drawLine(l, points, false, linePaint);
             }
             for (Point p : points) {
-                drawPoint(myCanvas, p);
+                drawPoint(p, false, pointPaint);
             }
-            for (Line l : lines) {
-                drawLine2.doo(myCanvas, l);
-            }
-            for (Point p : points2) {
-                drawPoint2.doo(myCanvas, p);
+            if (stereo3D != OFF_3D) {
+                points2.clear();
+                for (Point p : points) {
+                    points2.add(p.clone());
+                }
+                rotate(new int[]{1, 3}, rotate3D, points2);
+                for (Line l : lines) {
+                    drawLine(l, points2, true, linePaint2);
+                }
+                for (Point p : points2) {
+                    drawPoint(p, true, pointPaint2);
+                }
             }
             long timeTook = System.currentTimeMillis() - startTime;
             if (timeTook < 1000.0 / frameRate) {
@@ -185,63 +227,26 @@ public class HyperView extends View implements OnTouchListener {
         if (stereo3D != OFF_3D) {
             drawPoint2 = new DrawPoint2() {
                 @Override
-                public void doo(Canvas c, Point p) {
-                    double m = Math.pow(depth3D, p.getCoord(2)) * Math.pow(depth4D, p.getCoord(3) - 1);
-                    c.drawCircle((float) ((panX + m * size * sizeAdjust * p.getCoord(0)) + shift), (float) (panY + m * size * sizeAdjust * p.getCoord(1)), (float) ((Math.pow(depth3D, Math.pow(depth4D, p.getCoord(3) - 1) * p.getCoord(2))) * pointThickness), pointPaint2);
+                public void doo(Point p) {
+                    drawPoint(p, true, pointPaint2);
                 }
             };
             drawLine2 = new DrawLine2() {
-                Path path = new Path();
-                double m1;
-                double m2;
-                float width1;
-                float width2;
-                float x1;
-                float y1;
-                float x2;
-                float y2;
-                double theta;
-                float sinTheta;
-                float cosTheta;
-
                 @Override
-                public void doo(Canvas c, Line l) {
-                    m1 = Math.pow(depth3D, points2.get(l.getStartIndex()).getCoord(2)) * Math.pow(depth4D, points2.get(l.getStartIndex()).getCoord(3) - 1);
-                    m2 = Math.pow(depth3D, points2.get(l.getEndIndex()).getCoord(2)) * Math.pow(depth4D, points2.get(l.getEndIndex()).getCoord(3) - 1);
-                    //c.drawLine((float) ((panX + m1 * size * sizeAdjust * points2.get(l.getStartIndex()).getCoord(0)) + shift), (float) (panY + m1 * size * sizeAdjust * points2.get(l.getStartIndex()).getCoord(1)), (float) ((panX + m2 * size * sizeAdjust * points2.get(l.getEndIndex()).getCoord(0)) + shift), (float) (panY + m2 * size * sizeAdjust * points2.get(l.getEndIndex()).getCoord(1)), linePaint2);
-                    width1 = (float) ((Math.pow(depth3D, Math.pow(depth4D, points2.get(l.getStartIndex()).getCoord(3) - 1) * points2.get(l.getStartIndex()).getCoord(2))) * pointThickness / 2.0);
-                    //					width1 = (float) ((Math.pow(depth3D, Math.pow(depth4D, points2.get(l.getStartIndex()).getCoord(3)) * points2.get(l.getStartIndex()).getCoord(2))) * (pointThickness / 2.0));
-                    width2 = (float) ((Math.pow(depth3D, Math.pow(depth4D, points2.get(l.getEndIndex()).getCoord(3) - 1) * points2.get(l.getEndIndex()).getCoord(2))) * pointThickness / 2.0);
-                    //					width2 = (float) ((Math.pow(depth3D, Math.pow(depth4D, points2.get(l.getEndIndex()).getCoord(3)) * points2.get(l.getEndIndex()).getCoord(2))) * (pointThickness / 2.0));
-                    x1 = (float) (panX + m1 * size * sizeAdjust * points2.get(l.getStartIndex()).getCoord(0));
-                    y1 = (float) (panY + m1 * size * sizeAdjust * points2.get(l.getStartIndex()).getCoord(1));
-                    x2 = (float) (panX + m2 * size * sizeAdjust * points2.get(l.getEndIndex()).getCoord(0));
-                    y2 = (float) (panY + m2 * size * sizeAdjust * points2.get(l.getEndIndex()).getCoord(1));
-                    theta = 90;
-                    if (x2 - x1 != 0) {
-                        theta = Math.atan((y2 - y1) / (x2 - x1));
-                    }
-
-                    sinTheta = (float) Math.sin(theta);
-                    cosTheta = (float) Math.cos(theta);
-                    path.reset();
-                    path.moveTo((float) (x1 + width1 * sinTheta + shift), y1 - width1 * cosTheta);
-                    path.lineTo((float) (x1 - width1 * sinTheta + shift), y1 + width1 * cosTheta);
-                    path.lineTo((float) (x2 - width2 * sinTheta + shift), y2 + width2 * cosTheta);
-                    path.lineTo((float) (x2 + width2 * sinTheta + shift), y2 - width2 * cosTheta);
-                    c.drawPath(path, linePaint2);
+                public void doo(Line l) {
+                    drawLine(l, points2, true, linePaint2);
                 }
             };
 
         } else {
             drawPoint2 = new DrawPoint2() {
                 @Override
-                public void doo(Canvas c, Point p) {
+                public void doo(Point p) {
                 }
             };
             drawLine2 = new DrawLine2() {
                 @Override
-                public void doo(Canvas c, Line l) {
+                public void doo(Line l) {
                 }
             };
         }
@@ -292,7 +297,7 @@ public class HyperView extends View implements OnTouchListener {
     }
 
 
-    private void drawLine(Canvas c, Line l) {
+    private void drawLine(Line l, List<Point> points, boolean doShift, Paint paint) {
         double m1 = Math.pow(depth3D, points.get(l.getStartIndex()).getCoord(2)) * Math.pow(depth4D, points.get(l.getStartIndex()).getCoord(3) - 1);
         double m2 = Math.pow(depth3D, points.get(l.getEndIndex()).getCoord(2)) * Math.pow(depth4D, points.get(l.getEndIndex()).getCoord(3) - 1);
 
@@ -309,25 +314,33 @@ public class HyperView extends View implements OnTouchListener {
         path.reset();
         float sinTheta = (float) Math.sin(theta);
         float cosTheta = (float) Math.cos(theta);
-        path.moveTo(x1 + width1 * sinTheta, y1 - width1 * cosTheta);
-        path.lineTo(x1 - width1 * sinTheta, y1 + width1 * cosTheta);
-        path.lineTo(x2 - width2 * sinTheta, y2 + width2 * cosTheta);
-        path.lineTo(x2 + width2 * sinTheta, y2 - width2 * cosTheta);
-        c.drawPath(path, linePaint);
+        double shift = 0;
+        if (doShift) {
+            shift = this.shift;
+        }
+        path.moveTo((float) (x1 + width1 * sinTheta + shift), y1 - width1 * cosTheta);
+        path.lineTo((float) (x1 - width1 * sinTheta + shift), y1 + width1 * cosTheta);
+        path.lineTo((float) (x2 - width2 * sinTheta + shift), y2 + width2 * cosTheta);
+        path.lineTo((float) (x2 + width2 * sinTheta + shift), y2 - width2 * cosTheta);
+        myCanvas.drawPath(path, paint);
     }
 
-    private void drawBackground(Canvas c) {
-        c.drawColor(Color.BLACK);
+    private void drawBackground() {
+        myCanvas.drawColor(Color.BLACK);
     }
 
-    private void drawPoint(Canvas c, Point p) {
+    private void drawPoint(Point p, boolean doShift, Paint pointPaint) {
         double m = Math.pow(depth3D, p.getCoord(2)) * Math.pow(depth4D, p.getCoord(3) - 1);
-        c.drawCircle((float) (panX + m * size * sizeAdjust * p.getCoord(0)), (float) (panY + m * size * sizeAdjust * p.getCoord(1)), (float) ((Math.pow(depth3D, Math.pow(depth4D, p.getCoord(3) - 1) * p.getCoord(2))) * pointThickness), pointPaint);
+        double shift = 0;
+        if (doShift) {
+            shift = this.shift;
+        }
+        myCanvas.drawCircle((float) ((panX + m * size * sizeAdjust * p.getCoord(0)) + shift), (float) (panY + m * size * sizeAdjust * p.getCoord(1)), (float) ((Math.pow(depth3D, Math.pow(depth4D, p.getCoord(3) - 1) * p.getCoord(2))) * pointThickness), pointPaint);
     }
 
     public void rotate(int[] axes, double degrees, List<Point> points) {
         if (axes.length != dimension - 2) {
-            throw new IllegalArgumentException("You can't rotate a " + dimension + " dimensional object around " + axes.length + " dimensions!");
+            throw new IllegalArgumentException("You can't rotate a " + dimension + " dimensional object around " + axes.length + " axes!");
         }
         double sin_t = Math.sin(Math.toRadians(degrees));
         double cos_t = Math.cos(Math.toRadians(degrees));
@@ -368,8 +381,12 @@ public class HyperView extends View implements OnTouchListener {
             }
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 touching = false;
+                stopTouch = System.currentTimeMillis();
             } else {
                 touching = true;
+                if (!demo) {
+                    autoRotate = false;
+                }
             }
             currentX = event.getX();
             currentY = event.getY();
@@ -387,11 +404,11 @@ public class HyperView extends View implements OnTouchListener {
     }
 
     public interface DrawPoint2 {
-        void doo(Canvas c, Point p);
+        void doo(Point p);
     }
 
     public interface DrawLine2 {
-        void doo(Canvas c, Line l);
+        void doo(Line l);
     }
 
     boolean startExpand = true;

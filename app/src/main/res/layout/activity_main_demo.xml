@@ -16,16 +16,17 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/background_light"
+            android:background="#DFDFDF"
             android:orientation="vertical"
-            android:padding="8dp">
+            android:padding="16dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:gravity="center_horizontal"
                 android:text="Rotation"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#000000" />
 
             <RadioGroup
@@ -43,6 +44,7 @@
                     android:checked="true"
                     android:gravity="center"
                     android:text="  3D  "
+                    android:textAppearance="?android:attr/textAppearanceLarge"
                     android:textStyle="bold" />
 
                 <RadioButton
@@ -53,23 +55,31 @@
                     android:button="@android:color/transparent"
                     android:gravity="center"
                     android:text="  4D  "
+                    android:textAppearance="?android:attr/textAppearanceLarge"
                     android:textStyle="bold" />
             </RadioGroup>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="#DFDFDF"
+            android:orientation="vertical" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#E0E0E0"
+            android:background="#DFDFDF"
             android:orientation="vertical"
-            android:padding="8dp">
+            android:padding="16dp">
+            <!--android:background="#E0E0E0"-->
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="Stereoscopic 3D"
-                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="3D Viewing"
+                android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#000000" />
 
             <LinearLayout
@@ -93,19 +103,22 @@
                             android:layout_height="wrap_content"
                             android:background="@drawable/radio_selected"
                             android:button="@android:color/transparent"
-                            android:checked="true"
                             android:gravity="center"
                             android:text="  Off  "
-                            android:textStyle="bold" />
+                            android:textAppearance="?android:attr/textAppearanceLarge"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
 
                         <RadioButton
                             android:id="@+id/redCyan"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/radio_not_selected"
+                            android:background="@drawable/radio_selected"
                             android:button="@android:color/transparent"
+                            android:checked="true"
                             android:gravity="center"
-                            android:text="  Red/Cyan  "
+                            android:text="  Glasses  "
+                            android:textAppearance="?android:attr/textAppearanceLarge"
                             android:textStyle="bold" />
 
                         <RadioButton
@@ -116,6 +129,7 @@
                             android:button="@android:color/transparent"
                             android:gravity="center"
                             android:text="  Cross Eye  "
+                            android:textAppearance="?android:attr/textAppearanceLarge"
                             android:textStyle="bold" />
 
                         <RadioButton
@@ -126,7 +140,9 @@
                             android:button="@android:color/transparent"
                             android:gravity="center"
                             android:text="  Parallel  "
-                            android:textStyle="bold" />
+                            android:textAppearance="?android:attr/textAppearanceLarge"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
                     </RadioGroup>
                 </HorizontalScrollView>
 
@@ -134,9 +150,9 @@
                     android:id="@+id/angle3D"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:enabled="false"
                     android:max="150"
-                    android:progress="70" />
+                    android:progress="70"
+                    android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
 
@@ -145,14 +161,14 @@
             android:layout_height="wrap_content"
             android:background="@android:color/background_light"
             android:orientation="vertical"
-            android:padding="8dp">
+            android:padding="8dp"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:text="3D perspective"
-                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#000000" />
 
             <SeekBar
@@ -168,7 +184,8 @@
             android:layout_height="wrap_content"
             android:background="#E0E0E0"
             android:orientation="vertical"
-            android:padding="8dp">
+            android:padding="8dp"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -176,7 +193,6 @@
                 android:layout_gravity="center_vertical"
                 android:background="#E0E0E0"
                 android:text="4D perspective"
-                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#000000" />
 
             <SeekBar
@@ -192,13 +208,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="right"
-            android:background="@android:color/background_light">
+            android:background="#DFDFDF">
 
             <Button
                 android:id="@+id/hideSettingsButt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|right"
+                android:background="@drawable/hide_settings"
                 android:onClick="hideSettings"
                 android:text="&lt;"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
@@ -226,13 +243,68 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
+                    android:id="@+id/demoLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="75dp"
+                    android:background="#000000"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/demoText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_weight="1"
+                        android:background="#000000"
+                        android:onClick="nextDemo"
+                        android:text="HyperVision by Ryan Nemiroff"
+                        android:textAllCaps="false"
+                        android:textColor="#BFBFBF"
+                        android:textSize="30sp"
+                        android:visibility="gone" />
+
+                    <Button
+                        android:id="@+id/nextButt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:onClick="nextDemo"
+                        android:text="Next"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <Button
+                        android:id="@+id/demoButt"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:onClick="startDemo"
+                        android:text="Tap Here to Start Demo"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/endDemoButt"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:onClick="endDemo"
+                        android:text="End Demo"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+
+                <LinearLayout
                     android:id="@+id/rdLayout1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:paddingLeft="4dp"
-                    android:paddingRight="4dp">
+                    android:paddingRight="4dp"
+                    android:visibility="gone">
 
                     <Button
                         android:id="@+id/button3D1"
@@ -250,7 +322,8 @@
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:paddingLeft="4dp"
-                    android:paddingRight="4dp">
+                    android:paddingRight="4dp"
+                    android:visibility="gone">
 
                     <Button
                         android:id="@+id/button3D2"
