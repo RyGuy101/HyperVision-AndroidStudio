@@ -136,12 +136,8 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 findViewById(checkedId).setBackgroundResource(R.drawable.radio_selected);
                 for (int i = 0; i < stereo.getChildCount(); i++) {
-                    try {
-                        if (stereo.getChildAt(i).getId() != checkedId) {
-                            stereo.getChildAt(i).setBackgroundResource(R.drawable.radio_not_selected);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    if (stereo.getChildAt(i) instanceof RadioButton && stereo.getChildAt(i).getId() != checkedId) {
+                        stereo.getChildAt(i).setBackgroundResource(R.drawable.radio_not_selected);
                     }
                 }
                 if (checkedId != R.id.off3D)
@@ -282,9 +278,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void switchRotateDimension() {
-        if (hp.rotateDim == 3) {
+        if (hp.rotateDim == 2) {
             rotateDimChanged((RadioGroup) findViewById(R.id.rotateDimRG), R.id.rotate4D);
-        } else if (hp.rotateDim == 2) {
+        } else if (hp.rotateDim == 3) {
             rotateDimChanged((RadioGroup) findViewById(R.id.rotateDimRG), R.id.rotate3D);
         }
     }
@@ -300,10 +296,10 @@ public class MainActivity extends AppCompatActivity {
                 if (hp.stereo3D == HyperView.CROSS_EYE_3D || hp.stereo3D == HyperView.PARALLEL_3D) {
                     findViewById(R.id.rdLayout2).setVisibility(View.VISIBLE);
                 }
-                if (hp.rotate3D == 3) {
+                if (hp.rotate3D == 2) {
                     ((TextView) findViewById(R.id.button3D1)).setText("3D");
                     ((TextView) findViewById(R.id.button3D2)).setText("3D");
-                } else if (hp.rotate3D == 2) {
+                } else if (hp.rotate3D == 3) {
                     ((TextView) findViewById(R.id.button3D1)).setText("4D");
                     ((TextView) findViewById(R.id.button3D2)).setText("4D");
                 }
@@ -363,23 +359,17 @@ public class MainActivity extends AppCompatActivity {
 //        hp.down = 0;
         findViewById(checkedId).setBackgroundResource(R.drawable.radio_selected);
         for (int i = 0; i < rotateDimRG.getChildCount(); i++) {
-            try {
-                RadioButton temp = (RadioButton) rotateDimRG.getChildAt(i);
-                if (rotateDimRG.getChildAt(i).getId() != checkedId) {
-                    rotateDimRG.getChildAt(i).setBackgroundResource(R.drawable.radio_not_selected);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-
+            if (rotateDimRG.getChildAt(i) instanceof RadioButton && rotateDimRG.getChildAt(i).getId() != checkedId) {
+                rotateDimRG.getChildAt(i).setBackgroundResource(R.drawable.radio_not_selected);
             }
         }
         if (checkedId == R.id.rotate3D) {
-            hp.rotateDim = 3;
+            hp.rotateDim = 2;
             ((TextView) findViewById(R.id.button3D1)).setText("3D");
             ((TextView) findViewById(R.id.button3D2)).setText("3D");
             rotateDimRG.check(checkedId);
         } else if (checkedId == R.id.rotate4D) {
-            hp.rotateDim = 2;
+            hp.rotateDim = 3;
             ((TextView) findViewById(R.id.button3D1)).setText("4D");
             ((TextView) findViewById(R.id.button3D2)).setText("4D");
             rotateDimRG.check(checkedId);

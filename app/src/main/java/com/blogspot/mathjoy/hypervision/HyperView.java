@@ -1,7 +1,6 @@
 package com.blogspot.mathjoy.hypervision;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import android.content.Context;
@@ -10,14 +9,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.os.SystemClock;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.widget.Button;
 
 public class HyperView extends View implements OnTouchListener {
     double shift = 0;
@@ -51,7 +47,7 @@ public class HyperView extends View implements OnTouchListener {
     double autoRotateAngle = 360;
     boolean touching = false;
     int down = 0;
-    public int rotateDim = 3;
+    public int rotateDim = 2;
     public static final int OFF_3D = 0;
     public static final int RED_CYAN_3D = 1;
     public static final int CROSS_EYE_3D = 2;
@@ -153,30 +149,31 @@ public class HyperView extends View implements OnTouchListener {
                     for (Point p : originalPoints) {
                         points.add(p.clone());
                     }
-                    if (MainActivity.activity.demoStep == 3) {
-                        //rotate(new int[]{1, 3}, 15, points);
-                    } else if (MainActivity.activity.demoStep == 4) {
-                        rotate(new int[]{0, 3}, 15, points);
+//                    if (MainActivity.activity.demoStep == 3) {
+//                        rotate(0, 2, 15, points);
+//                    } else
+                    if (MainActivity.activity.demoStep == 4) {
+                        rotate(1, 2, 15, points);
                     }
                 }
                 if (autoRotateAngle != 0) {
-                    rotate(new int[]{1, 3}, -25, points);
+                    rotate(0, 2, -25, points);
                 }
                 autoRotateAngle += 0.6;
                 if (MainActivity.activity.demoStep != 3)
-                    rotate(new int[]{1, 2}, 0.6, points);
+                    rotate(0, 3, 0.6, points);
                 if (MainActivity.activity.demoStep != 4)
-                    rotate(new int[]{0, 3}, 0.6, points);
+                    rotate(1, 2, 0.6, points);
 //                if (MainActivity.activity.demoStep == 4) {
-                rotate(new int[]{1, 3}, 25, points);
+                rotate(0, 2, 25, points);
 //                }
             } else {
                 if (touching) {
                     velocityX = down * ((-currentX - -prevX) / size) * 60;
                     velocityY = down * ((-currentY - -prevY) / size) * 60;
                 }
-                rotate(new int[]{1, rotateDim}, velocityX, points);
-                rotate(new int[]{0, rotateDim}, velocityY, points);
+                rotate(0, rotateDim, velocityX, points);
+                rotate(1, rotateDim, velocityY, points);
                 prevX = currentX;
                 prevY = currentY;
                 down = 1;
@@ -192,7 +189,7 @@ public class HyperView extends View implements OnTouchListener {
                 for (Point p : points) {
                     points2.add(p.clone());
                 }
-                rotate(new int[]{1, 3}, rotate3D, points2);
+                rotate(0, 2, rotate3D, points2);
                 for (Line l : lines) {
                     drawLine(l, points2, true, linePaint2);
                 }
@@ -265,7 +262,7 @@ public class HyperView extends View implements OnTouchListener {
             linePaint2.setColor(Color.GRAY);
         }
 
-        rotate(new int[]{1, 3}, -rotate3D / 2.0 - rotate3DAdjust, points);
+        rotate(0, 2, -rotate3D / 2.0 - rotate3DAdjust, points);
         rotate3DAdjust = -rotate3D / 2.0;
         MainActivity.activity.refreshLeftRDButton();
         MainActivity.activity.refreshRightRDButton();
@@ -339,33 +336,18 @@ public class HyperView extends View implements OnTouchListener {
         myCanvas.drawCircle((float) ((panX + m * size * sizeAdjust * p.getCoord(0)) + shift), (float) (panY + m * size * sizeAdjust * p.getCoord(1)), (float) ((Math.pow(depth3D, Math.pow(depth4D, p.getCoord(3) - 1) * p.getCoord(2))) * pointThickness), pointPaint);
     }
 
-    public void rotate(int[] axes, double degrees, List<Point> points) {
-        if (axes.length != dimension - 2) {
-            throw new IllegalArgumentException("You can't rotate a " + dimension + " dimensional object around " + axes.length + " axes!");
-        }
-        Arrays.sort(axes);
-        int firstAffectedAxis = -1;
-        int secondAffectedAxis = -1;
-        for (int a = 0; a < dimension; a++) {
-            if (a >= axes.length || a != axes[a]) {
-                firstAffectedAxis = a;
-                break;
-            }
-        }
-        for (int a = firstAffectedAxis + 1; a < dimension; a++) {
-            if (a > axes.length || a != axes[a - 1]) {
-                secondAffectedAxis = a;
-                break;
-            }
+    public void rotate(int firstAxis, int secondAxis, double degrees, List<Point> points) { //The two axes define a plane
+        if (firstAxis >= dimension || secondAxis >= dimension) {
+            throw new IllegalArgumentException("Whoa! There aren't " + (Math.max(firstAxis, secondAxis) + 1) + "axes in " + dimension + "dimensions!");
         }
 
         double sin_t = Math.sin(Math.toRadians(degrees));
         double cos_t = Math.cos(Math.toRadians(degrees));
         for (Point p : points) {
-            double firstCoord = p.getCoord(firstAffectedAxis);
-            double secondCoord = p.getCoord(secondAffectedAxis);
-            p.setCoord(firstAffectedAxis, firstCoord * cos_t - secondCoord * sin_t);
-            p.setCoord(secondAffectedAxis, secondCoord * cos_t + firstCoord * sin_t);
+            double firstCoord = p.getCoord(firstAxis);
+            double secondCoord = p.getCoord(secondAxis);
+            p.setCoord(firstAxis, firstCoord * cos_t - secondCoord * sin_t);
+            p.setCoord(secondAxis, secondCoord * cos_t + firstCoord * sin_t);
         }
     }
 
