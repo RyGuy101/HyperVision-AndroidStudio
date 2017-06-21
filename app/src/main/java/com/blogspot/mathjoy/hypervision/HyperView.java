@@ -1,6 +1,7 @@
 package com.blogspot.mathjoy.hypervision;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import android.content.Context;
@@ -342,28 +343,29 @@ public class HyperView extends View implements OnTouchListener {
         if (axes.length != dimension - 2) {
             throw new IllegalArgumentException("You can't rotate a " + dimension + " dimensional object around " + axes.length + " axes!");
         }
+        Arrays.sort(axes);
+        int firstAffectedAxis = -1;
+        int secondAffectedAxis = -1;
+        for (int a = 0; a < dimension; a++) {
+            if (a >= axes.length || a != axes[a]) {
+                firstAffectedAxis = a;
+                break;
+            }
+        }
+        for (int a = firstAffectedAxis + 1; a < dimension; a++) {
+            if (a > axes.length || a != axes[a - 1]) {
+                secondAffectedAxis = a;
+                break;
+            }
+        }
+
         double sin_t = Math.sin(Math.toRadians(degrees));
         double cos_t = Math.cos(Math.toRadians(degrees));
-        for (int n = 0; n < points.size(); n++) {
-            Point point = points.get(n);
-            int[] affectedAxes = new int[2];
-            int index = 0;
-            for (int i = 0; i < axes.length + 2; i++) {
-                boolean match = false;
-                for (int axis : axes) {
-                    if (axis == i) {
-                        match = true;
-                    }
-                }
-                if (!match) {
-                    affectedAxes[index] = i;
-                    index++;
-                }
-            }
-            double first = point.getCoord(affectedAxes[0]);
-            double second = point.getCoord(affectedAxes[1]);
-            point.setCoord(affectedAxes[0], first * cos_t - second * sin_t);
-            point.setCoord(affectedAxes[1], second * cos_t + first * sin_t);
+        for (Point p : points) {
+            double firstCoord = p.getCoord(firstAffectedAxis);
+            double secondCoord = p.getCoord(secondAffectedAxis);
+            p.setCoord(firstAffectedAxis, firstCoord * cos_t - secondCoord * sin_t);
+            p.setCoord(secondAffectedAxis, secondCoord * cos_t + firstCoord * sin_t);
         }
     }
 
