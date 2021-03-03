@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -114,13 +115,16 @@ public class MainActivity extends AppCompatActivity {
                 setContentView(R.layout.activity_main_demo);
             } else {
                 setContentView(R.layout.activity_main);
-                findViewById(R.id.angle3D).setEnabled(false);//This doesn't work in XML?!
+                findViewById(R.id.eyeSeparation).setEnabled(false);//This doesn't work in XML?!
             }
         } else {
             setContentView(R.layout.activity_main);
-            findViewById(R.id.angle3D).setEnabled(false);//This doesn't work in XML?!
+            findViewById(R.id.eyeSeparation).setEnabled(false);//This doesn't work in XML?!
         }
         hp = (HyperView) findViewById(R.id.hyperView);
+        hp.ppi = getResources().getDisplayMetrics().densityDpi;
+        // Log.d("DPIIIIIIIII", String.valueOf(getResources().getDisplayMetrics().densityDpi));
+        // Log.d("XXXXXXXX", String.valueOf(getResources().getDisplayMetrics().xdpi));
         final RadioGroup rotateDimRG = (RadioGroup) findViewById(R.id.rotateDimRG);
         rotateDimRG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -140,10 +144,13 @@ public class MainActivity extends AppCompatActivity {
                         stereo.getChildAt(i).setBackgroundResource(R.drawable.radio_not_selected);
                     }
                 }
-                if (checkedId != R.id.off3D)
-                    (findViewById(R.id.angle3D)).setEnabled(true);
+                if (checkedId != R.id.off3D) {
+                    findViewById(R.id.eyeSeparation).setEnabled(true);
+                    findViewById(R.id.eyeSepText).setVisibility(View.VISIBLE);
+                }
                 if (checkedId == R.id.off3D) {
-                    (findViewById(R.id.angle3D)).setEnabled(false);
+                    findViewById(R.id.eyeSeparation).setEnabled(false);
+                    findViewById(R.id.eyeSepText).setVisibility(View.INVISIBLE);
                     hp.stereo3D = HyperView.OFF_3D;
                     hp.setup = true;
                 } else if (checkedId == R.id.redCyan) {
@@ -170,9 +177,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                double prevDepth3D = hp.depth3D;
-                hp.depth3D = progress / 1000.0 + 1;
-                hp.sizeAdjust /= hp.depth3D / prevDepth3D;
+                hp.eyePosZ = 1000.0 / (progress + 1);
+                hp.sizeAdjust = 1 / (hp.eyePosZ / (hp.eyePosZ - 1));
+                hp.updateEyePosX();
             }
         });
         ((SeekBar) findViewById(R.id.proj4D)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -186,11 +193,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                hp.depth4D = progress / 1000.0 + 1;
+                hp.camera4dPosW = 1000.0 / (progress + 1);
             }
         });
 
-        ((SeekBar) findViewById(R.id.angle3D)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        ((SeekBar) findViewById(R.id.eyeSeparation)).setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
@@ -201,16 +208,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                hp.rotate3DMagnitude = progress / 10.0;
-                if (hp.stereo3D == HyperView.CROSS_EYE_3D) {
-                    hp.rotate3D = -hp.rotate3DMagnitude;
-                } else if (hp.stereo3D != HyperView.OFF_3D) {
-                    hp.rotate3D = hp.rotate3DMagnitude;
-                } else {
-                    hp.rotate3D = 0;
-                }
-                hp.rotate(new int[]{1, 3}, -hp.rotate3D / 2.0 - HyperView.rotate3DAdjust, HyperView.points);
-                HyperView.rotate3DAdjust = -hp.rotate3D / 2.0;
+                hp.eyeSeparation = progress / 100.0;
+                hp.updateEyePosX();
             }
         });
         if (true) {
@@ -296,10 +295,10 @@ public class MainActivity extends AppCompatActivity {
                 if (hp.stereo3D == HyperView.CROSS_EYE_3D || hp.stereo3D == HyperView.PARALLEL_3D) {
                     findViewById(R.id.rdLayout2).setVisibility(View.VISIBLE);
                 }
-                if (hp.rotate3D == 2) {
+                if (hp.rotateDim == 2) {
                     ((TextView) findViewById(R.id.button3D1)).setText("3D");
                     ((TextView) findViewById(R.id.button3D2)).setText("3D");
-                } else if (hp.rotate3D == 3) {
+                } else if (hp.rotateDim == 3) {
                     ((TextView) findViewById(R.id.button3D1)).setText("4D");
                     ((TextView) findViewById(R.id.button3D2)).setText("4D");
                 }
@@ -335,11 +334,10 @@ public class MainActivity extends AppCompatActivity {
             HyperView.points.clear();
             HyperView.originalPoints.clear();
             HyperView.lines.clear();
-            ((SeekBar) findViewById(R.id.proj3D)).setProgress(125);
-            ((SeekBar) findViewById(R.id.proj4D)).setProgress(500);
-            ((SeekBar) findViewById(R.id.angle3D)).setProgress(70);
+            ((SeekBar) findViewById(R.id.proj3D)).setProgress(73);
+            ((SeekBar) findViewById(R.id.proj4D)).setProgress(499);
+            ((SeekBar) findViewById(R.id.eyeSeparation)).setProgress(200);
             rotateDimChanged((RadioGroup) findViewById(R.id.rotateDimRG), R.id.rotate3D);
-            HyperView.rotate3DAdjust = 0;
             hp.initialSetup();
             hp.setup = true;
         } else if (item.getItemId() == R.id.autoRotate) {

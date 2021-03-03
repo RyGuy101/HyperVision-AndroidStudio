@@ -147,11 +147,11 @@
                 </HorizontalScrollView>
 
                 <SeekBar
-                    android:id="@+id/angle3D"
+                    android:id="@+id/eyeSeparation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:max="150"
-                    android:progress="70"
+                    android:max="400"
+                    android:progress="200"
                     android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
@@ -175,8 +175,8 @@
                 android:id="@+id/proj3D"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:max="1000"
-                android:progress="125" />
+                android:max="249"
+                android:progress="73" />
         </LinearLayout>
 
         <LinearLayout
@@ -200,8 +200,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#E0E0E0"
-                android:max="1000"
-                android:progress="500" />
+                android:max="749"
+                android:progress="499" />
         </LinearLayout>
 
         <FrameLayout
@@ -335,10 +335,21 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <com.blogspot.mathjoy.hypervision.HyperView
-                android:id="@+id/hyperView"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:background="#000000">
+
+                <com.blogspot.mathjoy.hypervision.HyperView
+                    android:id="@+id/hyperView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#6F000000" />
+            </FrameLayout>
         </LinearLayout>
 
 
