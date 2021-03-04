@@ -26,7 +26,7 @@ public class HyperView extends View implements OnTouchListener {
     Paint linePaint = new Paint();
     Paint pointPaint2 = new Paint();
     Paint linePaint2 = new Paint();
-    // Paint filterPaint = new Paint();
+     Paint filterPaint = new Paint();
     static ArrayList<Point> originalPoints = new ArrayList<>();
     static ArrayList<Point> points = new ArrayList<>();
     static ArrayList<Line> lines = new ArrayList<>();
@@ -81,13 +81,6 @@ public class HyperView extends View implements OnTouchListener {
 
     public void initialSetup() {
         dpi = getResources().getDisplayMetrics().xdpi;
-//        filterPaint.setColorFilter(new ColorMatrixColorFilter(new float[]{
-//                15.9375f, 0, 0, 0, 0,
-//                0, 2.008f, 0, 0, 0,
-//                0, 0, 2.008f, 0, 0,
-//                0, 0, 0, 1, 0,
-//        }));
-//        setLayerType(LAYER_TYPE_HARDWARE, filterPaint);
 
         if (points.size() == 0) {
             for (int pointIndex = 0; pointIndex < numPoints; pointIndex++) {
@@ -250,15 +243,23 @@ public class HyperView extends View implements OnTouchListener {
             linePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
             pointPaint2.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
             linePaint2.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
+            filterPaint.setColorFilter(new ColorMatrixColorFilter(new float[]{
+                0.5625f, 0, 0, 0, 0,
+                0, 0.5625f, 0, 0, 0,
+                0, 0, 0.5625f, 0, 0,
+                0, 0, 0, 1, 0,
+            }));
+            setLayerType(LAYER_TYPE_HARDWARE, filterPaint);
         } else {
-            pointPaint.setColor(Color.argb(255, 255, 63, 63));
-            linePaint.setColor(Color.argb(255, 191, 191, 191));
-            pointPaint2.setColor(Color.argb(255, 255, 63, 63));
-            linePaint2.setColor(Color.argb(255, 191, 191, 191));
+            pointPaint.setColor(Color.argb(255, 223, 0, 0));
+            linePaint.setColor(Color.argb(255, 143, 143, 143));
+            pointPaint2.setColor(Color.argb(255, 223, 0, 0));
+            linePaint2.setColor(Color.argb(255, 143, 143, 143));
             pointPaint.setXfermode(null);
             linePaint.setXfermode(null);
             pointPaint2.setXfermode(null);
             linePaint2.setXfermode(null);
+            setLayerType(LAYER_TYPE_NONE, filterPaint);
         }
 
         MainActivity.activity.refreshLeftRDButton();

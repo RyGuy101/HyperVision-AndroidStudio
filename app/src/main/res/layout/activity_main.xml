@@ -64,10 +64,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
-            <View
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#6F000000" />
+                android:background="#00000000"
+                android:id="@+id/rotateMsg">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_alignParentBottom="true"
+                    android:text="rotate device for full screen"
+                    android:textColor="#5FFFFFFF" />
+            </RelativeLayout>
         </FrameLayout>
 
     </LinearLayout>
@@ -113,6 +123,14 @@
                 android:gravity="center"
                 android:text="  4D  "
                 android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:text="(double tap above)"
+                android:textColor="#8F8F8F" />
         </RadioGroup>
 
         <LinearLayout

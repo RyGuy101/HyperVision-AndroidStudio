@@ -290,6 +290,7 @@ public class MainActivity extends AppCompatActivity {
         if (!getResources().getBoolean(R.bool.isTablet)) {
             int orientation = getResources().getConfiguration().orientation;
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                findViewById(R.id.rotateMsg).setVisibility(View.GONE);
                 findViewById(R.id.settings).setVisibility(View.GONE);
                 findViewById(R.id.rdLayout1).setVisibility(View.VISIBLE);
                 if (hp.stereo3D == HyperView.CROSS_EYE_3D || hp.stereo3D == HyperView.PARALLEL_3D) {
@@ -312,6 +313,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 hp.setup = true;
             } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                findViewById(R.id.rotateMsg).setVisibility(View.VISIBLE);
                 findViewById(R.id.settings).setVisibility(View.VISIBLE);
                 findViewById(R.id.rdLayout1).setVisibility(View.GONE);
                 findViewById(R.id.rdLayout2).setVisibility(View.GONE);

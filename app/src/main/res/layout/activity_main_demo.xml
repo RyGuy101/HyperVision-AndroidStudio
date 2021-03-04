@@ -345,10 +345,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#6F000000" />
             </FrameLayout>
         </LinearLayout>
 
